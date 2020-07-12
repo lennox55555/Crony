@@ -1,9 +1,9 @@
-exports.handler = async (event) => {
-    // TODO implement
-    const response = {
-        statusCode: 200,
-       
-        body: JSON.stringify('API has been invoked by Lennox'),
-    };
-    return response;
-};
+import json
+
+def lambda_handler(event, context):
+    # TODO implement
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Hello from Lambda!')
+        
+    }
