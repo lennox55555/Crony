@@ -1,6 +1,7 @@
 import json
 import pymysql
 import sys
+import re
 
 REGION = 'us-west-2'
 
@@ -19,26 +20,48 @@ def save_events(event):
 def lambda_handler(event, context):
     httpMethod = event.get("context").get("http-method")  # From Mapping Template
     resourcePath = event.get("context").get("resource-path")
+    rootPath, extendedPath = splitResourcePath(resourcePath)
     save_events(event)
     print("Event is: ")
     print(event)
     # print("CONTEXT", dir(context))
     result = None
-    if httpMethod == "GET":
-        if resourcePath == "/user/{id}":
-            id = event.get("params").get("path").get("id")
-            result = returnExecution(displayPerson, "User", id)
-        else:
-            result = returnExecution(displayTable, "User")
-    elif httpMethod == "POST":
-        result = returnExecution(addUser, event.get("first_name"), event.get("last_name"), event.get("email"), event.get("address1"), event.get("address2"))
-    elif httpMethod == "DELETE":
-        if resourcePath == "/user/{id}":
-            id = event.get("params").get("path").get("id")
-            idArr = [id]
-            result = returnExecution(deleteUser, idArr)
-        else:
-            result = returnExecution(deleteUser, event.get("users_to_delete"))
+    if rootPath == "/user":
+        if httpMethod == "GET":
+            if extendedPath == "/{id}":
+                id = event.get("params").get("path").get("id")
+                result = returnExecution(displayPerson, "User", id)
+            else:
+                result = returnExecution(displayTable, "User")
+        elif httpMethod == "POST":
+            queryString = event.get("params").get("querystring")
+            result = returnExecution(addUser, queryString.get("first_name"), queryString.get("last_name"), queryString.get("email"), queryString.get("address1"), queryString.get("address2"))
+        elif httpMethod == "DELETE":
+            if extendedPath == "/{id}":
+                id = event.get("params").get("path").get("id")
+                idArr = [id]
+                result = returnExecution(deleteUser, idArr)
+            else:
+                # result = returnExecution(deleteUser, event.get("users_to_delete"))
+                pass
+    elif rootPath == "/profile":
+        if httpMethod == "GET":
+            if extendedPath == "/{id}":
+                id = event.get("params").get("path").get("id")
+                result = returnExecution(displayPerson, "Profile", id)
+            else:
+                result = returnExecution(displayTable, "Profile")
+        elif httpMethod == "POST":
+            queryString = event.get("params").get("querystring")
+            if extendedPath == "/{id}":
+                id = event.get("params").get("path").get("id")
+                result = returnExecution(addProfile, id, queryString.get("username"), queryString.get("age"), queryString.get("gender"), queryString.get("city"), queryString.get("state"), queryString.get("hiking_level"))
+        elif httpMethod == "DELETE":
+            if extendedPath == "/{id}":
+                id = event.get("params").get("path").get("id")
+                result = returnExecution(deleteProfile, id)
+    else:
+        result = "FAILED"
     # result = displayColumnNames("User")
     # result = addUser("Aayush", "Saxena", "aayush19saxena@gmail.com", "Somewhere in Washington")
     print("Data from RDS...")
@@ -71,10 +94,16 @@ def displayTable(table):
     cur.execute(f"""SELECT * FROM {table}""")
 
 def displayPerson(table, id):
-    cur.execute(f"""
-                SELECT * FROM {table}
-                WHERE id = {id}
-                """)
+    if table == "User":
+        cur.execute(f"""
+                    SELECT * FROM {table}
+                    WHERE id = {id}
+                    """)
+    elif table == "Profile":
+        cur.execute(f"""
+                    SELECT * FROM {table}
+                    WHERE profile_id = {id}
+                    """)
 
 def addUser(firstName, lastName, email, address1, address2=None):
     cur.execute(f"""
@@ -88,6 +117,43 @@ def deleteUser(idArr):
                     DELETE FROM User
                     WHERE id = {id}
                     """)
+                    
+def doesPersonExist(table, id):
+    with conn.cursor() as cur2:
+        # cur2.execute("SELECT 0 FROM User")
+        if table == "User":
+            cur2.execute(f"""
+                         SELECT 1
+                         FROM User
+                         WHERE id = {id}
+                         """)
+        elif table == "Profile":
+            cur2.execute(f"""
+                         SELECT 1
+                         FROM Profile
+                         WHERE profile_id = {id}
+                         """)
+        conn.commit()
+        cur2.close()
+    return (cur2.fetchone() != None)
+
+def addProfile(id, username, age, gender, city, state, hikingLevel):
+    if doesPersonExist("User", id):
+        if not doesPersonExist("Profile", id):
+            cur.execute(f"""
+                        INSERT INTO Profile(profile_id, username, age, gender, city, state, hiking_level)
+                        VALUES("{id}", "{username}", "{age}", "{gender}", "{city}", "{state}", "{hikingLevel}")
+                        """)
+        else:
+            raise ValueError("PROFILE ALREADY EXISTS")
+    else:
+        raise ValueError("USER DOES NOT EXIST")
+
+def deleteProfile(id):
+    cur.execute(f"""
+                DELETE FROM Profile
+                WHERE profile_id = {id}
+                """)
 
 def displayColumnNames(table):
     # cur.execute(f"""
@@ -104,3 +170,8 @@ def filterByExperience(min, max=5):  # max chosen arbitrarily
                 WHERE hikingLevel >= {min}
                 AND hikingLevel <= {max}
                 """)
+                
+def splitResourcePath(resourcePath):
+    pattern = r"(/[^/]+)(/.+)?"
+    match = re.match(pattern, resourcePath)
+    return match.groups()
