@@ -26,11 +26,14 @@ def lambda_handler(event, context):
     print(event)
     # print("CONTEXT", dir(context))
     result = None
+    errorMessage = None
     if rootPath == "/user":
         if httpMethod == "GET":
             if extendedPath == "/{id}":
                 id = event.get("params").get("path").get("id")
                 result = returnExecution(displayPerson, "User", id)
+                if result == []:
+                    errorMessage = "User does not exist!"
             else:
                 result = returnExecution(displayTable, "User")
         elif httpMethod == "POST":
@@ -49,6 +52,8 @@ def lambda_handler(event, context):
             if extendedPath == "/{id}":
                 id = event.get("params").get("path").get("id")
                 result = returnExecution(displayPerson, "Profile", id)
+                if result == []:
+                    errorMessage = "Profile does not exist!"
             else:
                 result = returnExecution(displayTable, "Profile")
         elif httpMethod == "POST":
@@ -66,6 +71,11 @@ def lambda_handler(event, context):
     # result = addUser("Aayush", "Saxena", "aayush19saxena@gmail.com", "Somewhere in Washington")
     print("Data from RDS...")
     print("Result: " + str(result))
+    if errorMessage != None:
+        return {
+            'statusCode': 400,
+            'body': errorMessage
+        }
     return {
         'statusCode': 200,
         'body': result
