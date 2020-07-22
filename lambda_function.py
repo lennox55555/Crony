@@ -14,6 +14,8 @@ db_name = 'crony'
 def save_events(event):
     global result
     result = []
+    global errorMessage
+    errorMessage = ""
     global conn
     conn = pymysql.connect(rds_host, user = name, passwd = password, db = db_name, connect_timeout = 5)
 
@@ -25,15 +27,13 @@ def lambda_handler(event, context):
     print("Event is: ")
     print(event)
     # print("CONTEXT", dir(context))
-    result = None
-    errorMessage = None
     if rootPath == "/user":
         if httpMethod == "GET":
             if extendedPath == "/{id}":
                 id = event.get("params").get("path").get("id")
                 result = returnExecution(displayPerson, "User", id)
                 if result == []:
-                    errorMessage = "User does not exist!"
+                    errorMessage = "400 Bad Request: User does not exist!"
             else:
                 result = returnExecution(displayTable, "User")
         elif httpMethod == "POST":
@@ -53,7 +53,7 @@ def lambda_handler(event, context):
                 id = event.get("params").get("path").get("id")
                 result = returnExecution(displayPerson, "Profile", id)
                 if result == []:
-                    errorMessage = "Profile does not exist!"
+                    errorMessage = "400 Bad Request: Profile does not exist!"
             else:
                 result = returnExecution(displayTable, "Profile")
         elif httpMethod == "POST":
@@ -71,11 +71,8 @@ def lambda_handler(event, context):
     # result = addUser("Aayush", "Saxena", "aayush19saxena@gmail.com", "Somewhere in Washington")
     print("Data from RDS...")
     print("Result: " + str(result))
-    if errorMessage != None:
-        return {
-            'statusCode': 400,
-            'body': errorMessage
-        }
+    if errorMessage != "":
+        raise LambdaError(errorMessage)
     return {
         'statusCode': 200,
         'body': result
@@ -155,9 +152,9 @@ def addProfile(id, username, age, gender, city, state, hikingLevel):
                         VALUES("{id}", "{username}", "{age}", "{gender}", "{city}", "{state}", "{hikingLevel}")
                         """)
         else:
-            raise ValueError("PROFILE ALREADY EXISTS")
+            errorMessage = "400 Bad Request: Profile already exists!"
     else:
-        raise ValueError("USER DOES NOT EXIST")
+        errorMessage = "400 Bad Request: User does not exist!"
 
 def deleteProfile(id):
     cur.execute(f"""
@@ -185,3 +182,6 @@ def splitResourcePath(resourcePath):
     pattern = r"(/[^/]+)(/.+)?"
     match = re.match(pattern, resourcePath)
     return match.groups()
+    
+class LambdaError(Exception):
+    pass
