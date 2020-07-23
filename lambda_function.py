@@ -84,7 +84,7 @@ def lambda_handler(event, context):
 
 def main(event, context):
     save_events(event)
-    
+
 def returnExecution(func, *args):
     global cur
     with conn.cursor() as cur:
@@ -95,7 +95,7 @@ def returnExecution(func, *args):
             print("HERE 1")
             result.append(list(row))
     return result
-    
+
 def displayTable(table):
     # cur.execute("""insert into User (id, firstName) values( %s, '%s')""" % (event['id'], event['name']))
     cur.execute(f"""SELECT * FROM {table}""")
@@ -124,7 +124,7 @@ def deleteUser(idArr):
                     DELETE FROM User
                     WHERE id = {id}
                     """)
-                    
+
 def doesPersonExist(table, id):
     with conn.cursor() as cur2:
         # cur2.execute("SELECT 0 FROM User")
@@ -173,15 +173,15 @@ def displayColumnNames(table):
 def filterByExperience(min, max=5):  # max chosen arbitrarily
     cur.execute(f"""
                 SELECT username, User.id
-                FROM Profile JOIN User ON (Profile.id = User.id) 
+                FROM Profile JOIN User ON (Profile.id = User.id)
                 WHERE hikingLevel >= {min}
                 AND hikingLevel <= {max}
                 """)
-                
+
 def splitResourcePath(resourcePath):
     pattern = r"(/[^/]+)(/.+)?"
     match = re.match(pattern, resourcePath)
     return match.groups()
-    
+
 class LambdaError(Exception):
     pass
