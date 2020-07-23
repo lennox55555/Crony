@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="style2.css">
     <title>Crony Create Account</title>
 </head>
+<script src="xhr.js" defer></script>
 <body>
 <nav>
     <div class="logo">
@@ -97,7 +98,7 @@
     <div class="box">
         <i class="fa fa-map-marker" aria-hidden="true"></i>
 
-        <input type="text" placeholder="State" name="" value="" maxlength="2">
+        <input type="text" placeholder="State" name="" value="">
     </div>
 
 
@@ -106,7 +107,9 @@
         <input type=password placeholder="Password" name="" value="">
     </div>
 
-    <input class="btn1" type="button" name="" value="Register">
+    <input class="btn1" id="post-btn" type="button" name="" value="Register">
 </div>
+
+
 </body>
 </html>
