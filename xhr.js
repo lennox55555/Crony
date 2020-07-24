@@ -31,7 +31,8 @@ const sendHttpRequest =(method, url, data) => {
 };
 
 const sendData = () => {
-    sendHttpRequest('POST', ' arn:aws:execute-api:us-west-2:768445991427:7ev126d843/*/POST/user', {
+
+    sendHttpRequest('POST', 'https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/user', {
         email: 'test@test.com',
         password: 'tester'
     }).then(responseData => {
