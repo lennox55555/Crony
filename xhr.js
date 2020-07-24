@@ -8,6 +8,12 @@ const sendHttpRequest =(method, url, data) => {
         xhr.responseType = 'json';
         if(data) {
             xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
+            // xhr.response.setRequestHeader("Access-Control-Allow-Origin", "*")
+            xhr.setRequestHeader("Access-Control-Allow-Methods", "*")
+            // xhr.setRequestHeader("Access-Control-Allow-Headers", "'Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token'")
+            xhr.setRequestHeader("Access-Control-Allow-Headers", "*")
+            xhr.withCredentials = false;
         }
 
         xhr.onload= () => {
@@ -31,11 +37,11 @@ const sendHttpRequest =(method, url, data) => {
 };
 
 const sendData = () => {
-    sendHttpRequest('POST', ' arn:aws:execute-api:us-west-2:768445991427:7ev126d843/*/POST/user', {
+    sendHttpRequest('POST', 'https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/user', {
         email: 'test@test.com',
         password: 'tester'
     }).then(responseData => {
-        console.logz(responseData);
+        console.log(responseData);
     }).catch(err => {
         console.log(err);
     });
