@@ -26,6 +26,7 @@ def lambda_handler(event, context):
     save_events(event)
     print("Event is: ")
     print(event)
+    global errorMessage  # Python is weird
     # print("CONTEXT", dir(context))
     if rootPath == "/user":
         if httpMethod == "GET":
@@ -38,7 +39,7 @@ def lambda_handler(event, context):
                 result = returnExecution(displayTable, "User")
         elif httpMethod == "POST":
             queryString = event.get("params").get("querystring")
-            result = returnExecution(addUser, queryString.get("first_name"), queryString.get("last_name"), queryString.get("email"), queryString.get("address1"), queryString.get("address2"))
+            result = returnExecution(addUser, queryString.get("first_name"), queryString.get("last_name"), queryString.get("email"), queryString.get("address1"), queryString.get("address2"), queryString.get("password"))
         elif httpMethod == "DELETE":
             if extendedPath == "/{id}":
                 id = event.get("params").get("path").get("id")
@@ -75,16 +76,21 @@ def lambda_handler(event, context):
         raise LambdaError(errorMessage)
     return {
         'statusCode': 200,
-        'body': result
+        'body': result,
         # 'body': json.dumps(str(event)),
         # 'context': dir(context),
         # 'TEST1': event.get("context"),
         # 'TEST2': event.get("params").get("path").get("id")
+        'headers': {
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': '*'
+        }
     }
 
 def main(event, context):
     save_events(event)
-
+    
 def returnExecution(func, *args):
     global cur
     with conn.cursor() as cur:
@@ -95,7 +101,7 @@ def returnExecution(func, *args):
             print("HERE 1")
             result.append(list(row))
     return result
-
+    
 def displayTable(table):
     # cur.execute("""insert into User (id, firstName) values( %s, '%s')""" % (event['id'], event['name']))
     cur.execute(f"""SELECT * FROM {table}""")
@@ -112,10 +118,10 @@ def displayPerson(table, id):
                     WHERE profile_id = {id}
                     """)
 
-def addUser(firstName, lastName, email, address1, address2=None):
+def addUser(firstName, lastName, email, address1, address2=None, password=None):
     cur.execute(f"""
-                INSERT INTO User(first_name, last_name, email, address1, address2)
-                VALUES("{firstName}", "{lastName}", "{email}", "{address1}", "{address2}")
+                INSERT INTO User(first_name, last_name, email, address1, address2, password)
+                VALUES("{firstName}", "{lastName}", "{email}", "{address1}", "{address2}", "{password}")
                 """)
 
 def deleteUser(idArr):
@@ -124,7 +130,7 @@ def deleteUser(idArr):
                     DELETE FROM User
                     WHERE id = {id}
                     """)
-
+                    
 def doesPersonExist(table, id):
     with conn.cursor() as cur2:
         # cur2.execute("SELECT 0 FROM User")
@@ -173,15 +179,15 @@ def displayColumnNames(table):
 def filterByExperience(min, max=5):  # max chosen arbitrarily
     cur.execute(f"""
                 SELECT username, User.id
-                FROM Profile JOIN User ON (Profile.id = User.id)
+                FROM Profile JOIN User ON (Profile.id = User.id) 
                 WHERE hikingLevel >= {min}
                 AND hikingLevel <= {max}
                 """)
-
+                
 def splitResourcePath(resourcePath):
     pattern = r"(/[^/]+)(/.+)?"
     match = re.match(pattern, resourcePath)
     return match.groups()
-
+    
 class LambdaError(Exception):
     pass
