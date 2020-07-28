@@ -8,7 +8,55 @@
     <link rel="stylesheet" href="style2.css">
     <title>Crony Create Account</title>
 </head>
-<script src="xhr.js" defer></script>
+
+<script type="text/javascript">
+    function fn1()
+    {
+        var str = document.getElementById("text11").value;
+        alert("The Account for "+str +" has been created.")
+        $(function () {
+            var $orders = $('#orders');
+            var $text11 = $('text11');
+            var $text10 = $('text10');
+            var $text9 = $('text9');
+            var $text8 = $('text8');
+            var $text7 = $('text7');
+            var $text6 = $('text6');
+            var $text5 = $('text5');
+            var $text4 = $('text4');
+            var $text3 = $('text3');
+            var $text2 = $('text2');
+            var $text1 = $('text1');
+
+            $('#post-btn').on('click', function () {
+
+                var order = {
+                    text11: $text11.val(),
+                    text10: $text10.val(),
+                    text9: $text9.val(),
+                    text8: $text8.val(),
+                    text7: $text7.val(),
+                    text6: $text6.val(),
+                    text5: $text5.val(),
+                    text4: $text4.val(),
+                    text3: $text3.val(),
+                    text2: $text2.val(),
+                    text1: $text1.val()
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/user/?',
+                    data: order,
+                    success: function(newOrder) {
+                        $orders.append('<li>my order</li>');
+                    }
+                });
+            });
+
+        });
+    }
+</script>
 <body>
 <nav>
     <div class="logo">
@@ -44,71 +92,72 @@
     <div class="box">
         <i class="fa fa-user" aria-hidden="true"></i>
 
-        <input type="text" placeholder="First Name" name="" value="">
+        <input id="text11" type="text" placeholder="First Name" name="" value="">
     </div>
 
     <div class="box">
         <i class="fa fa-user" aria-hidden="true"></i>
 
-        <input type="text" placeholder="Last Name" name="" value="">
+        <input id="text10" type="text" placeholder="Last Name" name="" value="">
     </div>
 
     <div class="box">
         <i class="fa fa-id-card-o" aria-hidden="true"></i>
 
-        <input type="text" placeholder="Age" name="" value="">
+        <input id="text9" type="text" placeholder="Age" name="" value="">
     </div>
 
     <div class="box">
         <i class="fa fa-venus-mars" aria-hidden="true"></i>
 
-        <input type="text" placeholder="Gender" name="" value="">
+        <input id="text8" type="text" placeholder="Gender" name="" value="">
     </div>
 
     <div class="box">
         <i class="fa fa-phone" aria-hidden="true"></i>
 
-        <input type="text" placeholder="Phone (1+" name="" value="">
+        <input id="text7" type="text" placeholder="Phone (1+" name="" value="">
     </div>
 
     <div class="box">
         <i class="fa fa-envelope-o" aria-hidden="true"></i>
 
-        <input type="text" placeholder="Email" name="" value="">
+        <input id="text6" type="text" placeholder="Email" name="" value="">
     </div>
 
     <div class="box">
         <i class="fa fa-map-marker" aria-hidden="true"></i>
 
-        <input type="text" placeholder="Address Line 1" name="" value="">
+        <input id="text5" type="text" placeholder="Address Line 1" name="" value="">
     </div>
 
     <div class="box">
         <i class="fa fa-map-marker" aria-hidden="true"></i>
 
-        <input type="text" placeholder="Address Line 2" name="" value="">
+        <input id="text4" type="text" placeholder="Address Line 2" name="" value="">
     </div>
 
     <div class="box">
         <i class="fa fa-map-marker" aria-hidden="true"></i>
 
-        <input type="text" placeholder="City" name="" value="">
+        <input id="text3" type="text" placeholder="City" name="" value="">
     </div>
 
     <div class="box">
         <i class="fa fa-map-marker" aria-hidden="true"></i>
 
-        <input type="text" placeholder="State" name="" value="">
+        <input id="text2" type="text" placeholder="State" name="" value="">
     </div>
 
 
     <div class="box">
         <i class="fa fa-lock" aria-hidden="true"></i>
-        <input type=password placeholder="Password" name="" value="">
+        <input id="text1" type=password placeholder="Password" name="" value="">
     </div>
 
-    <input class="btn1" id="post-btn" type="button" name="" value="Register">
+    <input class="btn1" onclick="fn1()" id="post-btn" type="button" name="" value="Register">
 </div>
+
 
 
 </body>
