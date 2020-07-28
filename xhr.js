@@ -31,12 +31,7 @@ const sendHttpRequest =(method, url, data) => {
 };
 
 const sendData = () => {
-<<<<<<< Updated upstream
-
     sendHttpRequest('POST', 'https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/user', {
-=======
-    sendHttpRequest('POST', 'https://crony-hiking.s3-us-west-2.amazonaws.com/index.html', {
->>>>>>> Stashed changes
         email: 'test@test.com',
         password: 'tester'
     }).then(responseData => {
