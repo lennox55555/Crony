@@ -47,3 +47,51 @@ const sendData = () => {
 };
 
 postBtn.addEventListener('click', sendData);
+
+
+function fn1()
+{
+    var str = document.getElementById("text11").value;
+    alert("The Account for "+str +" has been created.")
+    $(function () {
+        var $orders = $('#orders');
+        var $text11 = $('text11');
+        var $text10 = $('text10');
+        var $text9 = $('text9');
+        var $text8 = $('text8');
+        var $text7 = $('text7');
+        var $text6 = $('text6');
+        var $text5 = $('text5');
+        var $text4 = $('text4');
+        var $text3 = $('text3');
+        var $text2 = $('text2');
+        var $text1 = $('text1');
+
+        $('#post-btn').on('click', function () {
+
+            var order = {
+                text11: $text11.val(),
+                text10: $text10.val(),
+                text9: $text9.val(),
+                text8: $text8.val(),
+                text7: $text7.val(),
+                text6: $text6.val(),
+                text5: $text5.val(),
+                text4: $text4.val(),
+                text3: $text3.val(),
+                text2: $text2.val(),
+                text1: $text1.val()
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: 'https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/user/?',
+                data: order,
+                success: function(newOrder) {
+                    $orders.append('<li>my order</li>');
+                }
+            });
+        });
+
+    });
+}
