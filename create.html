@@ -27,11 +27,12 @@
             var $text4 = $('text4');
             var $text3 = $('text3');
             var $text2 = $('text2');
-            var $text1 = $('text1');
+            var $text1 = $('#text1');
 
             $('#post-btn').on('click', function () {
 
                 var order = {
+                    /*
                     text11: $text11.val(),
                     text10: $text10.val(),
                     text9: $text9.val(),
@@ -42,12 +43,42 @@
                     text4: $text4.val(),
                     text3: $text3.val(),
                     text2: $text2.val(),
-                    text1: $text1.val()
+                    text1: $text1.val(),
+                    */
+                    firstName: document.getElementById("text11").value,
+                    lastName: document.getElementById("text10").value,
+                    age: document.getElementById("text9").value,
+                    gender: document.getElementById("text8").value,
+                    phone: document.getElementById("text7").value,
+                    email: document.getElementById("text6").value,
+                    address1: document.getElementById("text5").value,
+                    address2: document.getElementById("text4").value,
+                    city: document.getElementById("text3").value,
+                    state: document.getElementById("text2").value,
+                    password: document.getElementById("text1").value
                 };
+
+                /*
+                console.log($orders);
+                console.log($text1);
+                console.log($text2);
+                console.log($text3);
+                console.log($text4);
+                console.log($text5);
+                console.log($text6);
+                console.log($text7);
+                console.log($text8);
+                console.log($text9);
+                console.log($text10);
+                console.log($text11);
+                */
+
+                let postUrl = `https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/user/first_name=${order.firstName}&last_name=${order.lastName}&email=${order.email}&address1=${order.address1}&address2=${order.address2}&password=${order.password}`;
 
                 $.ajax({
                     type: 'POST',
-                    url: 'https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/user/?',
+                    url: postUrl,
+                    // url: 'https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/user/',
                     data: order,
                     success: function(newOrder) {
                         $orders.append('<li>my order</li>');
