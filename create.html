@@ -13,7 +13,7 @@
 <script type="text/javascript" defer>
     function fn1()
     {
-        var str = document.getElementById("text11").value;
+        var str = document.getElementById("first_name").value;
         alert("The Account for "+str +" has been created.")
         $(function () {
             var $orders = $('#orders');
@@ -28,6 +28,19 @@
             var $text3 = $('text3');
             var $text2 = $('text2');
             var $text1 = $('#text1');
+            /*
+            var $first_name = $('first_name');
+            var $last_name = $('last_name');
+            var $age = $('age');
+            var $gender = $('gender');
+            var $phone_number = $('phone_number');
+            var $email = $('email');
+            var $address1 = $('address1');
+            var $address2 = $('address2');
+            var $city = $('city');
+            var $state = $('state');
+            var $password = $('password');
+            */
 
             $('#post-btn').on('click', function () {
 
@@ -56,6 +69,19 @@
                     city: document.getElementById("text3").value,
                     state: document.getElementById("text2").value,
                     password: document.getElementById("text1").value
+                    /*
+                    first_name: $first_name.val(),
+                    last_name: $last_name.val(),
+                    age: $age.val(),
+                    gender: $gender.val(),
+                    phone_number: $phone_number.val(),
+                    email: $email.val(),
+                    address1: $address1.val(),
+                    address2: $address2.val(),
+                    city: $city.val(),
+                    state: $state.val(),
+                    password: $password.val()
+                    */
                 };
 
                 /*
@@ -86,7 +112,7 @@
                     data: order,
                     contentType: 'application/json',
                     success: function(newOrder) {
-                        $orders.append('<li>my order</li>');
+                        $orders.append('<li>password: '+ newOrder.password +'state: '+ newOrder.state + 'city: '+ newOrder.city + 'address2: '+ newOrder.address2 + 'address1: '+ newOrder.address1 + 'email: '+ newOrder.email + 'phone_number: '+ newOrder.phone_number + 'gender: '+ newOrder.gender + 'age: '+ newOrder.age + 'last_name :'+ newOrder.last_name + 'first_name :'+ newOrder.first_name +'</li>');
                     }
                 });
             });
@@ -129,67 +155,67 @@
     <div class="box">
         <i class="fa fa-user" aria-hidden="true"></i>
 
-        <input id="text11" type="text" placeholder="First Name" name="" value="">
+        <input id="first_name" type="text" placeholder="First Name" name="" value="">
     </div>
 
     <div class="box">
         <i class="fa fa-user" aria-hidden="true"></i>
 
-        <input id="text10" type="text" placeholder="Last Name" name="" value="">
+        <input id="last_name" type="text" placeholder="Last Name" name="" value="">
     </div>
 
     <div class="box">
         <i class="fa fa-id-card-o" aria-hidden="true"></i>
 
-        <input id="text9" type="text" placeholder="Age" name="" value="">
+        <input id="age" type="text" placeholder="Age" name="" value="">
     </div>
 
     <div class="box">
         <i class="fa fa-venus-mars" aria-hidden="true"></i>
 
-        <input id="text8" type="text" placeholder="Gender" name="" value="">
+        <input id="gender" type="text" placeholder="Gender" name="" value="">
     </div>
 
     <div class="box">
         <i class="fa fa-phone" aria-hidden="true"></i>
 
-        <input id="text7" type="text" placeholder="Phone (1+" name="" value="">
+        <input id="phone_number" type="text" placeholder="Phone (1+" name="" value="">
     </div>
 
     <div class="box">
         <i class="fa fa-envelope-o" aria-hidden="true"></i>
 
-        <input id="text6" type="text" placeholder="Email" name="" value="">
+        <input id="email" type="text" placeholder="Email" name="" value="">
     </div>
 
     <div class="box">
         <i class="fa fa-map-marker" aria-hidden="true"></i>
 
-        <input id="text5" type="text" placeholder="Address Line 1" name="" value="">
+        <input id="address1" type="text" placeholder="Address Line 1" name="" value="">
     </div>
 
     <div class="box">
         <i class="fa fa-map-marker" aria-hidden="true"></i>
 
-        <input id="text4" type="text" placeholder="Address Line 2" name="" value="">
+        <input id="address2" type="text" placeholder="Address Line 2" name="" value="">
     </div>
 
     <div class="box">
         <i class="fa fa-map-marker" aria-hidden="true"></i>
 
-        <input id="text3" type="text" placeholder="City" name="" value="">
+        <input id="city" type="text" placeholder="City" name="" value="">
     </div>
 
     <div class="box">
         <i class="fa fa-map-marker" aria-hidden="true"></i>
 
-        <input id="text2" type="text" placeholder="State" name="" value="">
+        <input id="state" type="text" placeholder="State" name="" value="">
     </div>
 
 
     <div class="box">
         <i class="fa fa-lock" aria-hidden="true"></i>
-        <input id="text1" type=password placeholder="Password" name="" value="">
+        <input id="password" type=password placeholder="Password" name="" value="">
     </div>
 
     <input class="btn1" onclick="fn1()" id="post-btn" type="button" name="" value="Register">
