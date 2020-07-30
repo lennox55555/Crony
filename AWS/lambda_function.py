@@ -18,6 +18,8 @@ def save_events(event):
     errorMessage = ""
     global conn
     conn = pymysql.connect(rds_host, user = name, passwd = password, db = db_name, connect_timeout = 5)
+    global debugLog
+    debugLog = ""
 
 def lambda_handler(event, context):
     httpMethod = event.get("context").get("http-method")  # From Mapping Template
@@ -56,7 +58,12 @@ def lambda_handler(event, context):
                 if result == []:
                     errorMessage = "400 Bad Request: Profile does not exist!"
             else:
-                result = returnExecution(displayTable, "Profile")
+                queryString = event.get("params").get("querystring")
+                if queryString == {}:
+                    result = returnExecution(displayTable, "Profile")
+                else:
+                    result = returnExecution(getIdByFields, "Profile", queryString)
+                
         elif httpMethod == "POST":
             queryString = event.get("params").get("querystring")
             if extendedPath == "/{id}":
@@ -77,15 +84,13 @@ def lambda_handler(event, context):
     return {
         'statusCode': 200,
         'body': result,
-        # 'body': json.dumps(str(event)),
-        # 'context': dir(context),
-        # 'TEST1': event.get("context"),
-        # 'TEST2': event.get("params").get("path").get("id")
         'headers': {
             'Access-Control-Allow-Headers': '*',
             'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': '*'
-        }
+            'Access-Control-Allow-Methods': '*',
+            'Access-Control-Allow-Credentials' : True
+        },
+        'debugLog': debugLog
     }
 
 def main(event, context):
@@ -109,12 +114,12 @@ def displayTable(table):
 def displayPerson(table, id):
     if table == "User":
         cur.execute(f"""
-                    SELECT * FROM {table}
+                    SELECT * FROM User
                     WHERE id = {id}
                     """)
     elif table == "Profile":
         cur.execute(f"""
-                    SELECT * FROM {table}
+                    SELECT * FROM Profile
                     WHERE profile_id = {id}
                     """)
 
@@ -167,6 +172,35 @@ def deleteProfile(id):
                 DELETE FROM Profile
                 WHERE profile_id = {id}
                 """)
+                
+def getTableField(table, id, field):
+    if table == "User":
+        cur.execute(f"""
+                    SELECT {field} FROM User
+                    WHERE id = {id}
+                    """)
+    elif table == "Profile":
+        cur.execute(f"""
+                    SELECT {field} FROM Profile
+                    WHERE profile_id = {id}
+                    """)
+                    
+def getIdByFields(table, fields):
+    executionStringEnd = ""
+    for key in fields.keys():
+        executionStringEnd += f" AND {key} = \"{fields.get(key)}\""
+    executionStringEnd = executionStringEnd.replace(" AND ", "", 1)
+    
+    if table == "User":
+        cur.execute(f"""
+                    SELECT id FROM User
+                    WHERE {executionStringEnd}
+                    """)
+    elif table == "Profile":
+        cur.execute(f"""
+                    SELECT profile_id FROM Profile
+                    WHERE {executionStringEnd}
+                    """)
 
 def displayColumnNames(table):
     # cur.execute(f"""
