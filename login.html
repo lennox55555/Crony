@@ -8,6 +8,30 @@
     <link rel="stylesheet" href="style1.css">
     <title>Crony Login</title>
 </head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript" defer>
+    function fn2()
+    {
+        var str = document.getElementById("username").value;
+        alert("Welcome back "+str)
+        $(function () {
+
+            var $orders = $('#orders');
+
+            $.ajax({
+                type: 'GET',
+                url: 'https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/user/?',
+                success: function(orders) {
+                    $.each(orders, function(i, order) {
+                        $orders.append('<li>username: ' + order.name + 'password: ' + order.password + '</li>');
+                    });
+                }
+            });
+
+
+        });
+    }
+</script>
 <body>
 <nav>
     <div class="logo">
@@ -43,7 +67,7 @@
     <div class="textbox">
         <i class="fa fa-user" aria-hidden="true"></i>
 
-        <input type="text" placeholder="Username" name="" value="">
+        <input type="text" id="username" placeholder="Username" name="" value="">
     </div>
 
     <div class="textbox">
@@ -51,7 +75,7 @@
         <input type=password placeholder="Password" name="" value="">
     </div>
 
-    <input class="btn" type="button" name="" value="Sign in">
+    <input class="btn" onclick="fn2()" type="button" name="" value="Sign in">
 </div>
 </body>
 </html>
