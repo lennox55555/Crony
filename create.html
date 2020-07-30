@@ -17,6 +17,18 @@
         alert("The Account for "+str +" has been created.")
         $(function () {
             var $orders = $('#orders');
+            var $text11 = $('text11');
+            var $text10 = $('text10');
+            var $text9 = $('text9');
+            var $text8 = $('text8');
+            var $text7 = $('text7');
+            var $text6 = $('text6');
+            var $text5 = $('text5');
+            var $text4 = $('text4');
+            var $text3 = $('text3');
+            var $text2 = $('text2');
+            var $text1 = $('#text1');
+            /*
             var $first_name = $('first_name');
             var $last_name = $('last_name');
             var $age = $('age');
@@ -28,10 +40,36 @@
             var $city = $('city');
             var $state = $('state');
             var $password = $('password');
+            */
 
             $('#post-btn').on('click', function () {
 
                 var order = {
+                    /*
+                    text11: $text11.val(),
+                    text10: $text10.val(),
+                    text9: $text9.val(),
+                    text8: $text8.val(),
+                    text7: $text7.val(),
+                    text6: $text6.val(),
+                    text5: $text5.val(),
+                    text4: $text4.val(),
+                    text3: $text3.val(),
+                    text2: $text2.val(),
+                    text1: $text1.val(),
+                    */
+                    firstName: document.getElementById("text11").value,
+                    lastName: document.getElementById("text10").value,
+                    age: document.getElementById("text9").value,
+                    gender: document.getElementById("text8").value,
+                    phone: document.getElementById("text7").value,
+                    email: document.getElementById("text6").value,
+                    address1: document.getElementById("text5").value,
+                    address2: document.getElementById("text4").value,
+                    city: document.getElementById("text3").value,
+                    state: document.getElementById("text2").value,
+                    password: document.getElementById("text1").value
+                    /*
                     first_name: $first_name.val(),
                     last_name: $last_name.val(),
                     age: $age.val(),
@@ -43,12 +81,36 @@
                     city: $city.val(),
                     state: $state.val(),
                     password: $password.val()
+                    */
                 };
+
+                /*
+                console.log($orders);
+                console.log($text1);
+                console.log($text2);
+                console.log($text3);
+                console.log($text4);
+                console.log($text5);
+                console.log($text6);
+                console.log($text7);
+                console.log($text8);
+                console.log($text9);
+                console.log($text10);
+                console.log($text11);
+                */
+
+                let postUrl = `https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/user/?first_name=${order.firstName}&last_name=${order.lastName}&email=${order.email}&address1=${order.address1}&address2=${order.address2}&password=${order.password}`;
+                // console.log(postUrl);
 
                 $.ajax({
                     type: 'POST',
-                    url: 'https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/user/?',
+                    url: postUrl,
+                    // url: 'https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/user/?first_name=ggg&last_name=hhh&email=iii&address1=jjj&address2=mmm&password=nnn',
+                    // url: 'https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/user/',
+                    // crossDomain: true,
+                    // dataType: 'jsonp',
                     data: order,
+                    contentType: 'application/json',
                     success: function(newOrder) {
                         $orders.append('<li>password: '+ newOrder.password +'state: '+ newOrder.state + 'city: '+ newOrder.city + 'address2: '+ newOrder.address2 + 'address1: '+ newOrder.address1 + 'email: '+ newOrder.email + 'phone_number: '+ newOrder.phone_number + 'gender: '+ newOrder.gender + 'age: '+ newOrder.age + 'last_name :'+ newOrder.last_name + 'first_name :'+ newOrder.first_name +'</li>');
                     }
