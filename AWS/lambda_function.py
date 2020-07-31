@@ -116,15 +116,18 @@ def main(event, context):
     save_events(event)
     
 def returnExecution(func, *args):
-    global cur
-    with conn.cursor() as cur:
-        func(*args)  # Unpacks args array into function parameters
-        conn.commit()
-        cur.close()
-        for row in cur:
-            print("HERE 1")
-            result.append(list(row))
-    return result
+    try:
+        global cur
+        with conn.cursor() as cur:
+            func(*args)  # Unpacks args array into function parameters
+            conn.commit()
+            cur.close()
+            for row in cur:
+                print("HERE 1")
+                result.append(list(row))
+        return result
+    except:
+        pass
     
 def displayTable(table):
     # cur.execute("""insert into User (id, firstName) values( %s, '%s')""" % (event['id'], event['name']))
@@ -175,6 +178,7 @@ def doesPersonExist(table, id):
     return (cur2.fetchone() != None)
 
 def addProfile(id, username, age, gender, city, state, hikingLevel):
+    global errorMessage
     if doesPersonExist("User", id):
         if not doesPersonExist("Profile", id):
             cur.execute(f"""
