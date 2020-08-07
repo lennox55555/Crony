@@ -18,6 +18,8 @@ def save_events(event):
     errorMessage = ""
     global conn
     conn = pymysql.connect(rds_host, user = name, passwd = password, db = db_name, connect_timeout = 5)
+    global debugLog
+    debugLog = ""
 
 def lambda_handler(event, context):
     httpMethod = event.get("context").get("http-method")  # From Mapping Template
@@ -28,15 +30,27 @@ def lambda_handler(event, context):
     print(event)
     global errorMessage  # Python is weird
     # print("CONTEXT", dir(context))
+    debugLog = event.get("params").get("querystring")
     if rootPath == "/user":
         if httpMethod == "GET":
             if extendedPath == "/{id}":
                 id = event.get("params").get("path").get("id")
-                result = returnExecution(displayPerson, "User", id)
-                if result == []:
+                if doesPersonExist("User", id):
+                    queryString = event.get("params").get("querystring")
+                    if queryString == {}:
+                        result = returnExecution(displayPerson, "User", id)
+                        # if result == []:
+                        #     errorMessage = "400 Bad Request: User does not exist!"
+                    else:
+                        result = returnExecution(getField, "User", id, queryString.get("field"))
+                else:
                     errorMessage = "400 Bad Request: User does not exist!"
             else:
-                result = returnExecution(displayTable, "User")
+                queryString = event.get("params").get("querystring")
+                if queryString == {}:
+                    result = returnExecution(displayTable, "User")
+                else:
+                    result = returnExecution(getIdByFields, "User", queryString)
         elif httpMethod == "POST":
             queryString = event.get("params").get("querystring")
             result = returnExecution(addUser, queryString.get("first_name"), queryString.get("last_name"), queryString.get("email"), queryString.get("address1"), queryString.get("address2"), queryString.get("password"))
@@ -52,11 +66,23 @@ def lambda_handler(event, context):
         if httpMethod == "GET":
             if extendedPath == "/{id}":
                 id = event.get("params").get("path").get("id")
-                result = returnExecution(displayPerson, "Profile", id)
-                if result == []:
+                if doesPersonExist("Profile", id):
+                    queryString = event.get("params").get("querystring")
+                    if queryString == {}:
+                        result = returnExecution(displayPerson, "Profile", id)
+                        # if result == []:
+                        #     errorMessage = "400 Bad Request: Profile does not exist!"
+                    else:
+                        result = returnExecution(getField, "Profile", id, queryString.get("field"))
+                else:
                     errorMessage = "400 Bad Request: Profile does not exist!"
             else:
-                result = returnExecution(displayTable, "Profile")
+                queryString = event.get("params").get("querystring")
+                if queryString == {}:
+                    result = returnExecution(displayTable, "Profile")
+                else:
+                    result = returnExecution(getIdByFields, "Profile", queryString)
+                
         elif httpMethod == "POST":
             queryString = event.get("params").get("querystring")
             if extendedPath == "/{id}":
@@ -77,30 +103,31 @@ def lambda_handler(event, context):
     return {
         'statusCode': 200,
         'body': result,
-        # 'body': json.dumps(str(event)),
-        # 'context': dir(context),
-        # 'TEST1': event.get("context"),
-        # 'TEST2': event.get("params").get("path").get("id")
         'headers': {
             'Access-Control-Allow-Headers': '*',
             'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': '*'
-        }
+            'Access-Control-Allow-Methods': '*',
+            'Access-Control-Allow-Credentials' : True
+        },
+        'debugLog': debugLog
     }
 
 def main(event, context):
     save_events(event)
     
 def returnExecution(func, *args):
-    global cur
-    with conn.cursor() as cur:
-        func(*args)  # Unpacks args array into function parameters
-        conn.commit()
-        cur.close()
-        for row in cur:
-            print("HERE 1")
-            result.append(list(row))
-    return result
+    try:
+        global cur
+        with conn.cursor() as cur:
+            func(*args)  # Unpacks args array into function parameters
+            conn.commit()
+            cur.close()
+            for row in cur:
+                print("HERE 1")
+                result.append(list(row))
+        return result
+    except:
+        pass
     
 def displayTable(table):
     # cur.execute("""insert into User (id, firstName) values( %s, '%s')""" % (event['id'], event['name']))
@@ -109,12 +136,12 @@ def displayTable(table):
 def displayPerson(table, id):
     if table == "User":
         cur.execute(f"""
-                    SELECT * FROM {table}
+                    SELECT * FROM User
                     WHERE id = {id}
                     """)
     elif table == "Profile":
         cur.execute(f"""
-                    SELECT * FROM {table}
+                    SELECT * FROM Profile
                     WHERE profile_id = {id}
                     """)
 
@@ -151,6 +178,7 @@ def doesPersonExist(table, id):
     return (cur2.fetchone() != None)
 
 def addProfile(id, username, age, gender, city, state, hikingLevel):
+    global errorMessage
     if doesPersonExist("User", id):
         if not doesPersonExist("Profile", id):
             cur.execute(f"""
@@ -167,6 +195,35 @@ def deleteProfile(id):
                 DELETE FROM Profile
                 WHERE profile_id = {id}
                 """)
+                
+def getField(table, id, field):
+    if table == "User":
+        cur.execute(f"""
+                    SELECT {field} FROM User
+                    WHERE id = {id}
+                    """)
+    elif table == "Profile":
+        cur.execute(f"""
+                    SELECT {field} FROM Profile
+                    WHERE profile_id = {id}
+                    """)
+                    
+def getIdByFields(table, fields):
+    executionStringEnd = ""
+    for key in fields.keys():
+        executionStringEnd += f" AND {key} = \"{fields.get(key)}\""
+    executionStringEnd = executionStringEnd.replace(" AND ", "", 1)
+    
+    if table == "User":
+        cur.execute(f"""
+                    SELECT id FROM User
+                    WHERE {executionStringEnd}
+                    """)
+    elif table == "Profile":
+        cur.execute(f"""
+                    SELECT profile_id FROM Profile
+                    WHERE {executionStringEnd}
+                    """)
 
 def displayColumnNames(table):
     # cur.execute(f"""
