@@ -99,22 +99,99 @@
                 console.log($text11);
                 */
 
-                let postUrl = `https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/user/?first_name=${order.firstName}&last_name=${order.lastName}&email=${order.email}&address1=${order.address1}&address2=${order.address2}&password=${order.password}`;
+                let postUserUrl = `https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/user/?first_name=${order.firstName}&last_name=${order.lastName}&email=${order.email}&address1=${order.address1}&address2=${order.address2}&password=${order.password}`;
                 // console.log(postUrl);
 
-                $.ajax({
-                    type: 'POST',
-                    url: postUrl,
-                    // url: 'https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/user/?first_name=ggg&last_name=hhh&email=iii&address1=jjj&address2=mmm&password=nnn',
-                    // url: 'https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/user/',
-                    // crossDomain: true,
-                    // dataType: 'jsonp',
-                    data: order,
-                    contentType: 'application/json',
-                    success: function(newOrder) {
-                        $orders.append('<li>password: '+ newOrder.password +'state: '+ newOrder.state + 'city: '+ newOrder.city + 'address2: '+ newOrder.address2 + 'address1: '+ newOrder.address1 + 'email: '+ newOrder.email + 'phone_number: '+ newOrder.phone_number + 'gender: '+ newOrder.gender + 'age: '+ newOrder.age + 'last_name :'+ newOrder.last_name + 'first_name :'+ newOrder.first_name +'</li>');
-                    }
-                });
+                postUser()
+                    .then((data) => {
+                        console.log(data);
+                        getUser()
+                            .then((data2) => {
+                                console.log(data2);
+                                postProfile();
+                            })
+                            .catch((error2) => {
+                                console.log(error2);
+                            })
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    })
+
+
+                function postUser() {
+                    return new Promise((resolve, reject) => {
+                        $.ajax({
+                            type: 'POST',
+                            url: postUserUrl,
+                            // url: 'https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/user/?first_name=ggg&last_name=hhh&email=iii&address1=jjj&address2=mmm&password=nnn',
+                            // url: 'https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/user/',
+                            // crossDomain: true,
+                            // dataType: 'jsonp',
+                            data: order,
+                            contentType: 'application/json',
+                            success: function (newOrder) {
+                                $orders.append('<li>password: ' + newOrder.password + 'state: ' + newOrder.state + 'city: ' + newOrder.city + 'address2: ' + newOrder.address2 + 'address1: ' + newOrder.address1 + 'email: ' + newOrder.email + 'phone_number: ' + newOrder.phone_number + 'gender: ' + newOrder.gender + 'age: ' + newOrder.age + 'last_name :' + newOrder.last_name + 'first_name :' + newOrder.first_name + '</li>');
+                                resolve(newOrder);
+                            },
+                            error: function (error){
+                                reject(error)
+                            }
+                        });
+                    })
+                }
+
+                // sleep(5000);  // To give time to post into user table
+                let getUserUrl = `https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/user/?email=${order.email}`
+                // console.log(getUserUrl);
+                let id = -1;
+
+                function getUser() {
+                    return new Promise((resolve, reject) => {
+                        $.ajax({
+                            type: 'GET',
+                            url: getUserUrl,
+                            // data: order,
+                            contentType: 'application/json',
+                            success: function (newOrder) {
+                                id = newOrder.body[0][newOrder.body.length - 1];
+                                console.log(id);
+                                $orders.append('<li>password: ' + newOrder.password + 'state: ' + newOrder.state + 'city: ' + newOrder.city + 'address2: ' + newOrder.address2 + 'address1: ' + newOrder.address1 + 'email: ' + newOrder.email + 'phone_number: ' + newOrder.phone_number + 'gender: ' + newOrder.gender + 'age: ' + newOrder.age + 'last_name :' + newOrder.last_name + 'first_name :' + newOrder.first_name + '</li>');
+                                resolve(newOrder);
+                            },
+                            error: function (error){
+                                reject(error)
+                            }
+                        });
+                    })
+                }
+
+                // sleep(5000);
+                // let postProfileUrl = `https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/profile/${id}/?username=${order.username}&age=${order.age}&gender=${order.gender}&city=${order.city}&state=${order.state}&hiking_level=5`;
+                // console.log(postProfileUrl);
+
+                // sleep(5000);
+                function postProfile() {
+                    let postProfileUrl = `https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/profile/${id}/?username=${order.username}&age=${order.age}&gender=${order.gender}&city=${order.city}&state=${order.state}&hiking_level=5`;
+                    $.ajax({
+                        type: 'POST',
+                        url: postProfileUrl,
+                        data: order,
+                        contentType: 'application/json',
+                        success: function (newOrder) {
+                            $orders.append('<li>password: ' + newOrder.password + 'state: ' + newOrder.state + 'city: ' + newOrder.city + 'address2: ' + newOrder.address2 + 'address1: ' + newOrder.address1 + 'email: ' + newOrder.email + 'phone_number: ' + newOrder.phone_number + 'gender: ' + newOrder.gender + 'age: ' + newOrder.age + 'last_name :' + newOrder.last_name + 'first_name :' + newOrder.first_name + '</li>');
+                        }
+                    });
+                }
+
+
+                function sleep(milliseconds) {
+                    const date = Date.now();
+                    let currentDate = null;
+                    do {
+                        currentDate = Date.now();
+                    } while (currentDate - date < milliseconds);
+                }
             // });
 
         });
