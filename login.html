@@ -17,17 +17,22 @@
         $(function () {
 
             var $orders = $('#orders');
+            let getUrl = 'https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/profile/';
 
             $.ajax({
                 type: 'GET',
-                url: 'https://7ev126d843.execute-api.us-west-2.amazonaws.com/v1/user/?',
+                url: getUrl,
                 success: function(orders) {
+                    console.log(orders)
                     $.each(orders, function(i, order) {
+                        console.log(order);
                         $orders.append('<li>username: ' + order.name + 'password: ' + order.password + '</li>');
                     });
                 }
             });
-
+            // for (let line in $orders){
+            //     document.writeln(line);
+            // }
 
         });
     }
